@@ -1,5 +1,12 @@
 // Include gulp and plugins
-var gulp = require('gulp'),
+var pathSass = 'sass/',
+    pathJs = 'js/',
+	pathJsLibs = 'js/libs/',
+    distCssPath = 'dist/css/',
+    distCssFile = 'app.css',
+    distJsPath = 'dist/js/',
+    distJsFile = 'app.min.js',
+    gulp = require('gulp'),
     gutil = require('gulp-util'),
     jshint = require('gulp-jshint'),
     sass = require('gulp-sass'),
@@ -8,16 +15,12 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     uglifyjs = require('uglify-js'),
 //    rename = require('gulp-rename'),
-    sourcemaps = require('gulp-sourcemaps'),
-    pathSass = 'sass/',
-    pathJs = 'js/',
-    distCss = 'dist/css/',
-    distJs = 'dist/js/';
+    sourcemaps = require('gulp-sourcemaps');
 
 // Remove all file in distribution folder
 gulp.task('clean', function() {
-    console.log('[' + (new Date).toLocaleTimeString() + '] Deleting files inside folders:\n', distCss, '\n', distJs);
-    return del([distCss, distJs]);
+    console.log('[' + (new Date).toLocaleTimeString() + '] Deleting files inside folders:\n', distCssPath, '\n', distJsPath);
+    return del([distCssPath, distJsPath]);
 });
 
 // Compile Sass
@@ -27,9 +30,9 @@ gulp.task('sass', function() {
     return gulp.src(pathSass + '*.scss')
         .pipe(sourcemaps.init()) // Process the original sources
             .pipe(sass())
-            .pipe(concat('app.css'))
+            .pipe(concat(distCssFile))
         .pipe(sourcemaps.write()) // Add the map to modified source
-        .pipe(gulp.dest(distCss));
+        .pipe(gulp.dest(distCssPath));
 });
 
 // Lint Task
@@ -42,16 +45,16 @@ gulp.task('lint', function() {
 // Concatenate & Minify JS
 gulp.task('scripts', ['lint'], function() {
     console.log('[' + (new Date).toLocaleTimeString() + '] Concatenating and Minifying JavaScripts');
-    return gulp.src([pathJs + 'libs/*.js', pathJs + '*.js'])
+    return gulp.src([pathJsLibs + '*.js', pathJs + '*.js'])
         .pipe(sourcemaps.init()) // Process the original sources
-            .pipe(concat('app.min.js'))
-            .pipe(gulp.dest(distJs))
-//            .pipe(rename('app.min.js'))
+            .pipe(concat(distJsFile))
+            .pipe(gulp.dest(distJsPath))
+//            .pipe(rename(distJsFile))
 //            //only uglify if gulp is ran with '--type production'
 //            .pipe(gutil.env.type === 'production' ? uglify() : gutil.noop()) 
             .pipe(uglify())
         .pipe(sourcemaps.write()) // Add the map to modified source
-        .pipe(gulp.dest(distJs));
+        .pipe(gulp.dest(distJsPath));
 });
 
 // Watch Files For Changes
