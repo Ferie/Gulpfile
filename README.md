@@ -1,21 +1,24 @@
-# Progetto di base nuovo sito
+# A Gulpfile for any use
 
-Progetto di base con diversi componenti utilizzabili singolarmente.
+In this repository you can find a "ready to use" Gulpfile that can be used in any project.
 
-La cartella "html" contiene il codice generato dai "jsp" tramite l'utilizzo di wget.
+## Usage
 
-Il batch che scarica il sito locale e crea gli html, crea questi nuovi file in una cartella temporanea con data e ora di creazione.
+Simply install the necessary node modules (using npm or yaml, as you wish) and that's it.
 
-Gli altri script della cartella batch servono per convertire i jsp in file php funzionanti a parte per la prima riga di jsp che va rimossa a mano tramite editor con funzione trova sostituisci.
+**Note**: Keep them up to date so the Gulpfile can works at its best performances.
 
-Il file di supporto per la sostituzione sostituisce a righe alterne una riga (di codice jsp) con la successiva (che è php)
+#### The plugins used by this Gulpfile
 
-Il codice è suddiviso in cartelle:
+***gulp-concat***: concat the file that are passed to a single gulp task (https://www.npmjs.com/package/gulp-concat).
 
-- nella cartella css si trovano tutti i css usati suddivisi per generici e per i singoli componenti
-- nella cartella js vi si trovano tutti i javascript suddivisi per i diversi componenti
-- i plugin JavaScript importati sono nella cartella plugin
-- nella cartella includes ci sono file che vengono importati dai file php e jsp per parti di codice html comuni in tutte le pagine
-- nella cartella data si trovano alcuni json che servono per testare il funzionamento di alcuni componenti (gallery, eventi, search, ecc..)
+***jshint*** and ***gulp-jshint***: a linter for your JavaScript files (https://www.npmjs.com/package/jshint).
 
+***jshint-stylish***: this plugins is a stylish reporter for **jshint**, you can use the default one if you prefer  (https://www.npmjs.com/package/jshint-stylish).
+
+***gulp-sourcemaps***: a very useful plugins that track the built files for your debugs (https://www.npmjs.com/package/gulp-sourcemaps).
+
+***uglify-js*** and ***gulp-uglify***: plugin that minimizes the JavaScript files (https://www.npmjs.com/package/gulp-uglify).
+
+***gulp-rename***: a useful plugin only if you have to rename the distribution files (https://www.npmjs.com/package/gulp-rename).
 
