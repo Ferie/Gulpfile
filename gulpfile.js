@@ -1,7 +1,7 @@
 // Include gulp and plugins
 var pathSass = 'sass/',
     pathJs = 'js/',
-	pathJsLibs = 'js/libs/',
+    pathJsLibs = 'js/libs/',
     distCssPath = 'dist/css/',
     distCssFile = 'app.css',
     distJsPath = 'dist/js/',
@@ -17,7 +17,7 @@ var pathSass = 'sass/',
 //    rename = require('gulp-rename'),
     sourcemaps = require('gulp-sourcemaps');
 
-// Remove all file in distribution folder
+// Remove all file in distribution folders
 gulp.task('clean', function() {
     console.log('[' + (new Date).toLocaleTimeString() + '] Deleting files inside folders:\n', distCssPath, '\n', distJsPath);
     return del([distCssPath, distJsPath]);
@@ -72,5 +72,4 @@ gulp.task('default', ['clean'], function() {
     console.log('| Gulp is now building... |');
     console.log('===========================');
     gulp.start('sass', 'scripts');
-//    return gutil.log('Gulp is running the default task')
 });
