@@ -1,14 +1,15 @@
 // Include gulp and plugins
 var gulp = require('gulp'),
     gutil = require('gulp-util'),
-    jshint = require('gulp-jshint'),
-    sass = require('gulp-sass'),
     del = require('del'),
+    sass = require('gulp-sass'),
+    plumber = require('gulp-plumber'),
+    sourcemaps = require('gulp-sourcemaps'),
     concat = require('gulp-concat'),
+    jshint = require('gulp-jshint'),
     uglify = require('gulp-uglify'),
     uglifyjs = require('uglify-js'),
 //    rename = require('gulp-rename'),  /* Uncomment only if needed */
-    sourcemaps = require('gulp-sourcemaps'),
     pathSass = 'sass/',
     pathJs = 'js/',
 	jsLibs = 'js/libs/',
@@ -16,6 +17,13 @@ var gulp = require('gulp'),
     distCssFile = 'app.css',
     distJsPath = 'dist/js/',
     distJsFile = 'app.min.js';
+
+// Emit a beep sound on building error
+var onError = function (err) {
+    gutil.beep();
+    console.log(err.toString());
+    this.emit('end');
+};
 
 // Remove all files and directories in the distribution folder
 gulp.task('clean', function() {
@@ -28,6 +36,9 @@ gulp.task('sass', function() {
     console.log('[' + (new Date).toLocaleTimeString() + '] Compiling SASS');
 //    console.log((new Date).toUTCString() + ' Compiling SASS');
     return gulp.src(pathSass + '*.scss')
+        .pipe(plumber({
+            errorHandler: onError
+        }))
         .pipe(sourcemaps.init()) // Process the original sources
             .pipe(sass())
             .pipe(concat(distCssFile))
@@ -46,6 +57,9 @@ gulp.task('lint', function() {
 gulp.task('scripts', ['lint'], function() {
     console.log('[' + (new Date).toLocaleTimeString() + '] Concatenating and Minifying JavaScripts');
     return gulp.src([jsLibs + '*.js', pathJs + '*.js'])
+        .pipe(plumber({
+            errorHandler: onError
+        }))
         .pipe(sourcemaps.init()) // Process the original sources
             .pipe(concat(distJsFile))
             .pipe(gulp.dest(distJsPath))
