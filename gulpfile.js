@@ -48,7 +48,7 @@ gulp.task('sass', function() {
 
 // Lint Task
 gulp.task('lint', function() {
-    return gulp.src(pathJs + '*.js')
+    return gulp.src([pathJs + '*.js', pathJs + '**/*.js', '!' + jsLibs + '*.*'])
         .pipe(jshint())
         .pipe(jshint.reporter('jshint-stylish'));
 });
@@ -56,7 +56,7 @@ gulp.task('lint', function() {
 // Concatenate & Minify JS
 gulp.task('scripts', ['lint'], function() {
     console.log('[' + (new Date).toLocaleTimeString() + '] Concatenating and Minifying JavaScripts');
-    return gulp.src([jsLibs + '*.js', pathJs + '*.js'])
+    return gulp.src([jsLibs + '*.*', pathJs + '*.js', pathJs + '**/*.js'])
         .pipe(plumber({
             errorHandler: onError
         }))
