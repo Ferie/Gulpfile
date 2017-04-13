@@ -2,11 +2,11 @@
 
 In this repository you can find a "ready to use" Gulpfile that can be used in any project.
 
-## Usage
+## Configuration
 
-Simply install the necessary node modules (using ***npm*** or ***yarn***, as you wish) and that's it.
+Install the necessary node modules (using ***npm*** or ***yarn***, as you wish) and that's it. For your convenience all the necessary plugins are put in the ```package.json``` so it is easier to install them via package manager.
 
-All you have to do now is to update your personal paths and built files in the initial variables (top of the file):
+All you have to do now is to update your personal paths in the initial variables (at the top of the file):
 
 - ***pathSass*** is the path where there are your source SASS files
 
@@ -14,15 +14,35 @@ All you have to do now is to update your personal paths and built files in the i
 
 - ***pathJsLibs*** is the path where there are your source JavaScript libraries (or frameworks, or vendors, or whatever)
 
-- ***distCssPath*** is the path where the built CSS file will be delivered
+- ***distCssPath*** is the path where the built CSS file will be placed
 
-- ***distJsPath*** is the path where the built JavaScript file will be delivered
+- ***distJsPath*** is the path where the built JavaScript file will be placed
 
-- ***distCssFile*** is the name of the built CSS file
+- ***distCssFile*** is the name of the built/minified CSS file
 
-- ***distJsFile*** is the name of the built JavaScript file
+- ***distJsFile*** is the name of the built/minified JavaScript file
 
-**Note**: If you change the paths, remember to add the "/" (slash) at the end of them!!!
+**Note**: If you change the paths, remember to add the "/" (slash) at the end of them!
+
+## Run Gulp
+
+In a node environment, simply run:
+
+```
+gulp
+```
+
+You can also run both the compiler/builder and the watcher at the same time:
+
+```
+gulp && gulp watch
+```
+
+This Gulpfile comes with the option to also minify your built files for production environments:
+
+```
+gulp --type production
+```
 
 ## The plugins used by this Gulpfile
 
@@ -36,7 +56,7 @@ All you have to do now is to update your personal paths and built files in the i
 
 - ***gulp-sourcemaps***: a very useful plugins that track the built files for your debugs (https://www.npmjs.com/package/gulp-sourcemaps).
 
-- ***uglify-js*** and ***gulp-uglify***: plugin that minimizes the JavaScript files (https://www.npmjs.com/package/gulp-uglify).
+- ***uglify-js*** and ***gulp-uglify***: plugin that minimises the JavaScript files (https://www.npmjs.com/package/gulp-uglify).
 
 - ***gulp-rename***: a useful plugin only if you have to rename the distribution files (https://www.npmjs.com/package/gulp-rename).
 
