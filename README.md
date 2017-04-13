@@ -4,7 +4,7 @@ In this repository you can find a "ready to use" Gulpfile that can be used in an
 
 ## Usage
 
-Simply install the necessary node modules (using ***npm*** or ***yaml***, as you wish) and that's it.
+Simply install the necessary node modules (using ***npm*** or ***yarn***, as you wish) and that's it.
 
 All you have to do now is to update your personal paths and built files in the initial variables (top of the file):
 
