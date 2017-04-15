@@ -112,7 +112,7 @@ gulp.task('lint', ['html', 'css', 'js'], function() {
 // Concatenate & Minify JS
 gulp.task('scripts', ['js'], function() {
     gutil.log('Gulp is concatenating and minifying the JavaScripts');
-    return gulp.src([jsLibs + 'angular.js', jsLibs + '*.js', pathJs + '*.js', pathJs + '**/*.js'])
+    return gulp.src([jsLibs + '*.js', pathJs + '*.js', pathJs + '**/*.js'])
         .pipe(sourcemaps.init()) // Process the original sources
             .pipe(concat(distJsFile))
 //            .pipe(rename(distJsFile))
