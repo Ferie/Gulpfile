@@ -51,6 +51,12 @@ var gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     uglify = require('gulp-uglify');
 
+var handleError = function (error) {
+    gutil.beep();
+    gutil.log(gutil.colors.red('ERROR: ' + error));
+    this.emit('end');
+};
+
 // Remove all files and directories in the distribution folder
 gulp.task('clean', function() {
     gutil.log('Gulp is deleting the files inside folders:\n', distCssPath, '\n', distJsPath);
@@ -63,14 +69,12 @@ gulp.task('sass', function() {
     return gulp.src(pathSass + '*.scss')
         .pipe(sourcemaps.init()) // Process the original sources
             .pipe(sass())
-            .on('error', function (error) {
-                gutil.beep();
-                gutil.log(gutil.colors.red("ERROR", 'sass'), error);
-                this.emit('end', new gutil.PluginError('sass', error, { showStack: true }));
-            })
+            .on('error', handleError)
             .pipe(concat(distCssFile))
+            .on('error', handleError)
             // Only minify if Gulp is ran with '--type production'
             .pipe(gutil.env.type === 'production' ? minifycss() : gutil.noop())
+            .on('error', handleError)
         .pipe(sourcemaps.write()) // Add the map to modified source
         .pipe(gulp.dest(distCssPath))
         .pipe(livereload());
@@ -115,13 +119,11 @@ gulp.task('scripts', ['js'], function() {
     return gulp.src([jsLibs + '*.js', pathJs + '*.js', pathJs + '**/*.js'])
         .pipe(sourcemaps.init()) // Process the original sources
             .pipe(concat(distJsFile))
+            .on('error', handleError)
 //            .pipe(rename(distJsFile))
             // only uglify if gulp is ran with '--type production'
             .pipe(gutil.env.type === 'production' ? uglify() : gutil.noop())
-            .on('error', function (error, fileName, cause) {
-                gutil.beep();
-                gutil.log('ERROR: ' + fileName + '\n' + error + '\n' + cause);
-            })
+            .on('error', handleError)
         .pipe(sourcemaps.write()) // Add the map to modified source
         .pipe(gulp.dest(distJsPath))
         .pipe(livereload());
