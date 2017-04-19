@@ -2,23 +2,29 @@
 
 In this repository you can find a "ready to use" Gulpfile that can be used in any project.
 
-## Configuration
+## Installation
 
-Install the necessary node modules (using ***npm*** or ***yarn***, as you wish) and that's it. For your convenience all the necessary plugins are put in the ```package.json``` so it is easier to install them via package manager.
+Once you have put the `Gulpfile.js` in your project main directory, install the necessary plugins using a package manager **npm**, **yarn**, **bower**, etc... as you wish and that's it: now you are ready to use Gulp.
+
+## Configuration
 
 All you have to do now is to update your personal paths in the initial variables (at the top of the file):
 
-- ***pathSass*** is the path where there are your source SASS files
+- ***pathHtml*** is the path where there are all your main HTML files
 
-- ***pathJs*** is the path where there are your source JavaScript files
+- ***pathViews*** is the path where there are all your HTML views if you are using a framework
+
+- ***pathSass*** is the path where there are your source SASS files (all the sub-folders are scanned as well for changes)
+
+- ***pathJs*** is the path where there are your source JavaScript files (all the sub-folders are scanned as well for changes
 
 - ***pathJsLibs*** is the path where there are your source JavaScript libraries (or frameworks, or vendors, or whatever)
 
 - ***distCssPath*** is the path where the built CSS file will be placed
 
-- ***distJsPath*** is the path where the built JavaScript file will be placed
-
 - ***distCssFile*** is the name of the built/minified CSS file
+
+- ***distJsPath*** is the path where the built JavaScript file will be placed
 
 - ***distJsFile*** is the name of the built/minified JavaScript file
 
@@ -26,7 +32,7 @@ All you have to do now is to update your personal paths in the initial variables
 
 ## Run Gulp
 
-In a node environment, simply run:
+In the terminal command line simply run:
 
 ```
 gulp
@@ -38,7 +44,7 @@ You can also run both the compiler/builder and the watcher at the same time:
 gulp && gulp watch
 ```
 
-This Gulpfile comes with the option to also minify your built files for production environments:
+This Gulpfile comes with the option to also minify your built files (styles and scripts) for production environments:
 
 ```
 gulp --type production
@@ -46,19 +52,37 @@ gulp --type production
 
 ## The plugins used by this Gulpfile
 
+All the necessary plugins are in the `package.json` so it is easier to install them via package manager.
+
 **Note**: Keep them up to date so the Gulpfile can works at its best performances.
 
-- ***gulp-concat***: concat the file that are passed to a single gulp task (https://www.npmjs.com/package/gulp-concat).
+- ***gulp***: this is the main plugin that runs Gulp, it is used for automation of time-consuming and repetitive tasks involved in web development like minification, concatenation, cache busting, unit testing, linting, optimization etc. (https://www.npmjs.com/package/gulp).
 
-- ***jshint*** and ***gulp-jshint***: a linter for your JavaScript files (https://www.npmjs.com/package/jshint).
-
-- ***jshint-stylish***: this plugins is a stylish reporter for **jshint**, you can use the ***default*** one if you prefer  (https://www.npmjs.com/package/jshint-stylish).
-
-- ***gulp-sourcemaps***: a very useful plugins that track the built files for your debugs (https://www.npmjs.com/package/gulp-sourcemaps).
-
-- ***uglify-js*** and ***gulp-uglify***: plugin that minimises the JavaScript files (https://www.npmjs.com/package/gulp-uglify).
-
-- ***gulp-rename***: a useful plugin only if you have to rename the distribution files (https://www.npmjs.com/package/gulp-rename).
+- ***gulp-util***: utility functions for gulp plugins (https://www.npmjs.com/package/gulp-util).
 
 - ***del***: used in the **clean** task to remove any previous built files (https://www.npmjs.com/package/del).
+
+- ***gulp-sass***: plugin that compiles the SASS files (https://www.npmjs.com/package/gulp-sass).
+
+- ***gulp-csslint***: a linter plugin for the CSS distribution file (https://www.npmjs.com/package/gulp-csslint).
+
+- ***gulp-clean-css***: a plugin to minify the CSS (https://www.npmjs.com/package/gulp-clean-css).
+
+- ***gulp-htmlhint***: a linter plugin for the HTML files (https://www.npmjs.com/package/gulp-htmlhint).
+
+- ***htmlhint-stylish***: a stylish plugin reporter for HTMLHint (https://www.npmjs.com/package/htmlhint-stylish).
+
+- ***gulp-sourcemaps***: a very useful plugins that maps the built files for easy debugging (https://www.npmjs.com/package/gulp-sourcemaps).
+
+- ***gulp-livereload***: it monitors the sources files and automatically compile them and reload the page as soon as the source code is saved (https://www.npmjs.com/package/gulp-livereload).
+
+- ***gulp-concat***: concats the files that are passed in in a single one (https://www.npmjs.com/package/gulp-concat).
+
+- ***gulp-jshint***: a linter plugin for the JavaScript files (https://www.npmjs.com/package/gulp-jshint).
+
+- ***jshint-stylish***: a stylish plugin reporter for Gulp-JSHint (https://www.npmjs.com/package/jshint-stylish).
+
+- ***gulp-uglify***: a plugin to minify the JavaScript files (https://www.npmjs.com/package/gulp-uglify).
+
+- ***gulp-rename***: a plugin used only if you have to rename the distribution files: by default it is commented in the Gulpfile, so you have to uncomment the corresponding lines if you want to use it (https://www.npmjs.com/package/gulp-rename).
 
