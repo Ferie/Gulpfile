@@ -4,7 +4,9 @@ In this repository you can find a "ready to use" Gulpfile that can be used in an
 
 ## Installation
 
-Once you have put the `Gulpfile.js` in your project main directory, install the necessary plugins using a package manager **npm**, **yarn**, **bower**, etc... as you wish and that's it: now you are ready to use Gulp.
+All the necessary plugins are in the `package.json` so it is easier to install them via package manager.
+
+Once you have put the `Gulpfile.js` in your project main directory, install the necessary plugins using a package manager (`npm`, `yarn`, `bower`, etc... as you wish) and that's it: you are now ready to use Gulp.
 
 ## Configuration
 
@@ -51,8 +53,6 @@ gulp --type production
 ```
 
 ## The plugins used by this Gulpfile
-
-All the necessary plugins are in the `package.json` so it is easier to install them via package manager.
 
 **Note**: Keep them up to date so the Gulpfile can works at its best performances.
 
