@@ -1,14 +1,11 @@
 /**
  * Gulp
- *
- * A ready to use Gulpfile for any project
- *
+ * 
  * Author: Riccardo Andreatta
- *
- * Change the path variables to match your project structure:
- *
+ * 
+ * Path variables that match the project structure:
+ * 
  * 'pathHtml' this is the folder where there are all your HTML files,
- * 'pathViews' this is the root folder where there are all your views,
  * 'pathSass' this is the root folder where there are all your SASS files,
  * 'pathJs' this is the root folder where there are all your JavaScript files,
  * 'jsLibs' this is the folder where there are all your JavaScripts libraries (they are not linted and concatenated before the other JS files),
@@ -16,37 +13,42 @@
  * 'distCssFile' and this is the name of the built CSS file,
  * 'distJsPath' this is the folder where you want the built JS file be put,
  * 'distJsFile' and this is the name of the built JS file.
- *
- * Note: Running Gulp with the suffix '--type production' also minify the distCssFile and uglify the distJsFile
- *
+ * 
+ * Note: Running Gulp with the suffix '--type production' it minifies the distCssFile and uglifies the distJsFile
+ * 
  */
 
 'use strict';
 
-// Gulp configuration
-var pathHtml = '/',
-    pathViews = 'views/',
-    pathSass = 'src/sass/',
-    pathJs = 'src/js/',
-    jsLibs = 'src/js/libs/',
+/****************************************************/
+/* GULP CONFIGURATION                               */
+/****************************************************/
+
+var pathHtml = 'app/',
+    pathSass = 'assets/sass/',
+    pathJs = 'app/',
+    jsLibs = 'assets/js/libs/',
+    distPath = 'dist/',
     distCssPath = 'dist/css/',
-    distCssFile = 'app.css',
+    distCssFile = 'vida.min.css',
     distJsPath = 'dist/js/',
-    distJsFile = 'app.min.js';
+    distJsFile = 'vida.min.js';
 
+/****************************************************/
 /*** You should leave the remaining part as it is ***/
+/****************************************************/
 
-// Include gulp and plugins
+// Require Gulp and other plugins
 var gulp = require('gulp'),
     gutil = require('gulp-util'),
+    connect = require('gulp-connect'),
+    modRewrite = require('connect-modrewrite'),
     del = require('del'),
     sass = require('gulp-sass'),
     csslint = require('gulp-csslint'),
-    cleancss = require('gulp-clean-css'),
+    cssmin = require('gulp-cssmin'),
     htmlhint = require('gulp-htmlhint'),
-//    rename = require('gulp-rename'),
     sourcemaps = require('gulp-sourcemaps'),
-    livereload = require('gulp-livereload'),
     concat = require('gulp-concat'),
     jshint = require('gulp-jshint'),
     uglify = require('gulp-uglify');
@@ -66,14 +68,14 @@ gulp.task('clean', function() {
 // Validate HTML
 gulp.task('html', function() {
     gutil.log('Gulp is validating the HTML...');
-    return gulp.src([pathHtml + '*.html', pathViews + '*.html', pathViews + '**/*.html'])
+    return gulp.src([pathHtml + '*.html', pathHtml + '**/*.html'])
         .pipe(htmlhint({'doctype-first': false}))
         .pipe(htmlhint.reporter('htmlhint-stylish'));
 });
 
-// Compile Sass
+// Compile Sass & Minify CSS
 gulp.task('sass', function() {
-    gutil.log('Compiling SASS');
+    gutil.log('Gulp is compiling the SASS');
     return gulp.src(pathSass + '*.scss')
         .pipe(sourcemaps.init()) // Process the original sources
             .pipe(sass())
@@ -81,11 +83,11 @@ gulp.task('sass', function() {
             .pipe(concat(distCssFile))
             .on('error', handleError)
             // Only minify if Gulp is ran with '--type production'
-            .pipe(gutil.env.type === 'production' ? cleancss() : gutil.noop())
+            .pipe(gutil.env.type === 'production' ? cssmin() : gutil.noop())
             .on('error', handleError)
         .pipe(sourcemaps.write()) // Add the map to modified source
         .pipe(gulp.dest(distCssPath))
-        .pipe(livereload());
+        .pipe(connect.reload());
 });
 
 // Validate CSS
@@ -95,7 +97,8 @@ gulp.task('css', ['sass'], function() {
         .pipe(csslint({
             'order-alphabetical': false,
             'outline-none': false,
-            'box-sizing': false
+            'box-sizing': false,
+            'adjoining-classes': false
         }))
         .pipe(csslint.formatter());
 });
@@ -110,18 +113,17 @@ gulp.task('js', function() {
 
 // Concatenate & Minify JS
 gulp.task('scripts', ['js'], function() {
-    gutil.log('Gulp is concatenating and minifying the JavaScripts');
-    return gulp.src([jsLibs + '*.js', pathJs + '*.js', pathJs + '**/*.js'])
+    gutil.log('Gulp is concatenating the JavaScripts');
+    return gulp.src([jsLibs + 'angular.js', jsLibs + '*.js', pathJs + '*.js', pathJs + '**/*.js'])
         .pipe(sourcemaps.init()) // Process the original sources
             .pipe(concat(distJsFile))
             .on('error', handleError)
-//            .pipe(rename(distJsFile))
             // only uglify if gulp is ran with '--type production'
-            .pipe(gutil.env.type === 'production' ? uglify() : gutil.noop())
+            .pipe(gutil.env.type === 'production' ? uglify({mangle: false}) : gutil.noop())
             .on('error', handleError)
         .pipe(sourcemaps.write()) // Add the map to modified source
         .pipe(gulp.dest(distJsPath))
-        .pipe(livereload());
+        .pipe(connect.reload());
 });
 
 // Lint Task
@@ -129,9 +131,27 @@ gulp.task('lint', ['html', 'css', 'js'], function() {
     return;
 });
 
-// Watch Files For Changes
+// Server Task with Livereload
+gulp.task('server', ['watch'], function () {
+    connect.server({
+        root: __dirname,
+        livereload: true,
+//        livereload.port: 35729,
+        fallback: 'app/index.html',
+        port: process.env.PORT || 9050,
+        host: 'localhost',
+        middleware: function () {
+            return [
+                modRewrite([
+                    '^/api/(.*)$ http://localhost:9050/api/v1/$1 [P]'
+                ])
+            ];
+        }
+    });
+});
+
+// Watch Task
 gulp.task('watch', ['css', 'scripts'], function() {
-    livereload.listen();
     gulp.watch([pathJs + '*.js', pathJs + '**/*.js'], ['scripts'])
     .on('change', function(event) {
         gutil.log('File ' + event.path + ' was ' + event.type);
@@ -157,5 +177,4 @@ gulp.task('default', ['clean'], function() {
     gutil.log('| Gulp is now building... |');
     gutil.log('===========================');
     gulp.start('html', 'css', 'scripts');
-//    return gutil.log('Gulp is running the default task')
 });
