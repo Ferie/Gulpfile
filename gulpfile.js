@@ -38,9 +38,14 @@ var pathHtml = 'app/',
 /*** You should leave the remaining part as it is ***/
 /****************************************************/
 
+var env = process.env.NODE_ENV || 'development';
+
 // Require Gulp and other plugins
 var gulp = require('gulp'),
-    gutil = require('gulp-util'),
+    debug = require('gulp-debug')
+    crashSound = require('gulp-crash-sound')
+    noop = require("gulp-noop"),
+    color = require("gulp-color"),
     connect = require('gulp-connect'),
     modRewrite = require('connect-modrewrite'),
     del = require('del'),
@@ -54,20 +59,20 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify');
 
 var handleError = function (error) {
-    gutil.beep();
-    gutil.log(gutil.colors.red('ERROR: ' + error));
+    crashSound.play();
+    debug(color('ERROR: ' + error, 'RED'));
     this.emit('end');
 };
 
 // Remove all file in distribution folder
 gulp.task('clean', function() {
-    gutil.log('Gulp is deleting the files inside folders:\n', distCssPath, '\n', distJsPath);
+    debug('Gulp is deleting the files inside folders:\n', distCssPath, '\n', distJsPath);
     return del([distCssPath, distJsPath]);
 });
 
 // Validate HTML
 gulp.task('html', function() {
-    gutil.log('Gulp is validating the HTML...');
+    debug('Gulp is validating the HTML...');
     return gulp.src([pathHtml + '*.html', pathHtml + '**/*.html'])
         .pipe(htmlhint({'doctype-first': false}))
         .pipe(htmlhint.reporter('htmlhint-stylish'));
@@ -75,15 +80,14 @@ gulp.task('html', function() {
 
 // Compile Sass & Minify CSS
 gulp.task('sass', function() {
-    gutil.log('Gulp is compiling the SASS');
+    debug('Gulp is compiling the SASS');
     return gulp.src(pathSass + '*.scss')
         .pipe(sourcemaps.init()) // Process the original sources
             .pipe(sass())
             .on('error', handleError)
             .pipe(concat(distCssFile))
             .on('error', handleError)
-            // Only minify if Gulp is ran with '--type production'
-            .pipe(gutil.env.type === 'production' ? cssmin() : gutil.noop())
+            .pipe(gulpif(env === 'production', cssmin()))
             .on('error', handleError)
         .pipe(sourcemaps.write()) // Add the map to modified source
         .pipe(gulp.dest(distCssPath))
@@ -92,7 +96,7 @@ gulp.task('sass', function() {
 
 // Validate CSS
 gulp.task('css', ['sass'], function() {
-    gutil.log('Gulp is validating the CSS...');
+    debug('Gulp is validating the CSS...');
     return gulp.src([distCssPath + distCssFile])
         .pipe(csslint({
             'order-alphabetical': false,
@@ -105,7 +109,7 @@ gulp.task('css', ['sass'], function() {
 
 // Validate JS
 gulp.task('js', function() {
-    gutil.log('Gulp is validating the JavaScripts...');
+    debug('Gulp is validating the JavaScripts...');
     return gulp.src([pathJs + '*.js', pathJs + '**/*.js', '!' + jsLibs + '*.*'])
         .pipe(jshint())
         .pipe(jshint.reporter('jshint-stylish'));
@@ -113,13 +117,14 @@ gulp.task('js', function() {
 
 // Concatenate & Minify JS
 gulp.task('scripts', ['js'], function() {
-    gutil.log('Gulp is concatenating the JavaScripts');
+    debug('Gulp is concatenating the JavaScripts');
     return gulp.src([jsLibs + 'angular.js', jsLibs + '*.js', pathJs + '*.js', pathJs + '**/*.js'])
         .pipe(sourcemaps.init()) // Process the original sources
             .pipe(concat(distJsFile))
             .on('error', handleError)
-            // only uglify if gulp is ran with '--type production'
-            .pipe(gutil.env.type === 'production' ? uglify({mangle: false}) : gutil.noop())
+            .pipe(gulpif(env === 'production', uglify({
+                mangle: false
+            })))
             .on('error', handleError)
         .pipe(sourcemaps.write()) // Add the map to modified source
         .pipe(gulp.dest(distJsPath))
@@ -154,27 +159,27 @@ gulp.task('server', ['watch'], function () {
 gulp.task('watch', ['css', 'scripts'], function() {
     gulp.watch([pathJs + '*.js', pathJs + '**/*.js'], ['scripts'])
     .on('change', function(event) {
-        gutil.log('File ' + event.path + ' was ' + event.type);
-        gutil.log('===============');
-        gutil.log('| Building... |');
-        gutil.log('===============');
+        debug('File ' + event.path + ' was ' + event.type);
+        debug('===============');
+        debug('| Building... |');
+        debug('===============');
     });
     gulp.watch([pathSass + '*.*', pathSass + '**/*.*'], ['sass'])
     .on('change', function(event) {
-        gutil.log('File ' + event.path + ' was ' + event.type);
-        gutil.log('===============');
-        gutil.log('| Building... |');
-        gutil.log('===============');
+        debug('File ' + event.path + ' was ' + event.type);
+        debug('===============');
+        debug('| Building... |');
+        debug('===============');
     });
-    gutil.log('===========================');
-    gutil.log('| Gulp is now watching... |');
-    gutil.log('===========================');
+    debug('===========================');
+    debug('| Gulp is now watching... |');
+    debug('===========================');
 });
 
 // Default Task
 gulp.task('default', ['clean'], function() {
-    gutil.log('===========================');
-    gutil.log('| Gulp is now building... |');
-    gutil.log('===========================');
+    debug('===========================');
+    debug('| Gulp is now building... |');
+    debug('===========================');
     gulp.start('html', 'css', 'scripts');
 });
