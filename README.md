@@ -52,13 +52,9 @@ This Gulpfile comes with the option to also minify your built files (styles and 
 gulp --type production
 ```
 
-## The plugins used by this Gulpfile
+## Dependencies
 
-**Note**: Keep them up to date so the Gulpfile can works at its best performances.
-
-- ***gulp***: this is the main plugin that runs Gulp, it is used for automation of time-consuming and repetitive tasks involved in web development like minification, concatenation, cache busting, unit testing, linting, optimization etc. (https://www.npmjs.com/package/gulp).
-
-- ***gulp-util***: utility functions for gulp plugins (https://www.npmjs.com/package/gulp-util).
+- ***gulp***: it is used for automation of time-consuming and repetitive tasks involved in web development like minification, concatenation, cache busting, unit testing, linting, optimization etc. (https://www.npmjs.com/package/gulp).
 
 - ***del***: used in the **clean** task to remove any previous built files (https://www.npmjs.com/package/del).
 

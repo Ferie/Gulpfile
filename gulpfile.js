@@ -1,38 +1,37 @@
 /**
- * Gulp
+ * Gulpfile ready to use
  * 
  * Author: Riccardo Andreatta
  * 
- * Path variables that match the project structure:
- * 
- * 'pathHtml' this is the folder where there are all your HTML files,
- * 'pathSass' this is the root folder where there are all your SASS files,
- * 'pathJs' this is the root folder where there are all your JavaScript files,
- * 'jsLibs' this is the folder where there are all your JavaScripts libraries (they are not linted and concatenated before the other JS files),
- * 'distCssPath' this is the folder where you want the built CSS file be put,
- * 'distCssFile' and this is the name of the built CSS file,
- * 'distJsPath' this is the folder where you want the built JS file be put,
- * 'distJsFile' and this is the name of the built JS file.
- * 
- * Note: Running Gulp with the suffix '--type production' it minifies the distCssFile and uglifies the distJsFile
- * 
+ * Variables for configuration:
+ * `port` port available for the localhost,
+ * `pathHtml` this is the path to the folder where there are all the HTML files,
+ * `pathSass` this is the path to the folder where there are all the SASS files,
+ * `pathJs` this is the path to the folder where there are all the JavaScript files,
+ * `jsLibs` this is the path to the folder where eventually there are JavaScripts libraries
+ *      (they are not linted but they are concatenated before the other JS files),
+ * `distCssPath` this is the path to the folder where you want the distribution CSS file,
+ * `distCssFile` and this is the name of the built CSS file,
+ * `distJsPath`  this is the path to the folder where you want the distribution JavaScript file,
+ * `distJsFile` and this is the name of the built JavaScript file.
  */
 
 'use strict';
 
 /****************************************************/
-/* GULP CONFIGURATION                               */
+/*** GULP CONFIGURATION                           ***/
 /****************************************************/
 
-var pathHtml = 'app/',
+var port = '9050',
+    pathHtml = 'app/',
     pathSass = 'assets/sass/',
-    pathJs = 'app/',
+    pathJs = 'app/js',
     jsLibs = 'assets/js/libs/',
     distPath = 'dist/',
     distCssPath = 'dist/css/',
-    distCssFile = 'vida.min.css',
+    distCssFile = 'app.min.css',
     distJsPath = 'dist/js/',
-    distJsFile = 'vida.min.js';
+    distJsFile = 'app.min.js';
 
 /****************************************************/
 /*** You should leave the remaining part as it is ***/
@@ -143,12 +142,12 @@ gulp.task('server', ['watch'], function () {
         livereload: true,
 //        livereload.port: 35729,
         fallback: 'app/index.html',
-        port: process.env.PORT || 9050,
+        port: process.env.PORT || port,
         host: 'localhost',
         middleware: function () {
             return [
                 modRewrite([
-                    '^/api/(.*)$ http://localhost:9050/api/v1/$1 [P]'
+                    '^/api/(.*)$ http://localhost:' + port + '/api/v1/$1 [P]'
                 ])
             ];
         }
@@ -157,6 +156,13 @@ gulp.task('server', ['watch'], function () {
 
 // Watch Task
 gulp.task('watch', ['css', 'scripts'], function() {
+    gulp.watch([pathHtml + '*.html', pathHtml + '**/*.html'], ['html'])
+    .on('change', function(event) {
+        gutil.log('File ' + event.path + ' was ' + event.type);
+        gutil.log('===============');
+        gutil.log('| Building... |');
+        gutil.log('===============');
+    });
     gulp.watch([pathJs + '*.js', pathJs + '**/*.js'], ['scripts'])
     .on('change', function(event) {
         debug('File ' + event.path + ' was ' + event.type);
@@ -182,4 +188,86 @@ gulp.task('default', ['clean'], function() {
     debug('| Gulp is now building... |');
     debug('===========================');
     gulp.start('html', 'css', 'scripts');
+});
+
+/****************************************************
+ * AUTO GENERATED DOCUMENTATION TASK                *
+ *                                                  *
+ * Creates automated documentation via the specific *
+ * comments throughout the js code.                 *
+ ****************************************************/
+
+var jsdoc = require('gulp-jsdoc3');
+
+gulp.task('jsDoc', function (cb) {
+    gulp.src(
+        [
+            'README.md',
+            pathJs + '*.js',
+            pathJs + '**/*.js',
+            '!' + jsLibs + '*.*'
+        ],
+        {
+            read: false
+        }
+    )
+    .pipe(jsdoc(cb));
+});
+
+/****************************************************/
+/* ADD HEADER TO MINIMIZED FILES                    */
+/****************************************************/
+
+var header = require('gulp-header');
+var fs = require('fs');
+var pkg = JSON.parse(fs.readFileSync('package.json'));
+var opts = {
+    banner: [
+        '/**',
+        ' * <%= description %> - <%= homepage %>',
+        ' * Version - <%= version %>',
+        ' * Licensed under the <%= license.name %> license - <%= license.link %>',
+        ' *',
+        ' * Copyright (c) <%= new Date().getFullYear() %> <%= author.company %>',
+        ' */\n\n'
+    ].join('\n')
+};
+
+/****************************************************/
+/* HEROKU ENVIRONMENT TASKS                         */
+/****************************************************/
+
+// Compile Sass & Minify CSS for Heroku environment
+gulp.task('heroku:styles', function () {
+    gutil.log('Gulp is compiling the SASS and concatenating and minifying the CSS');
+    return gulp.src(pathSass + '*.scss')
+        .pipe(sass())
+        .pipe(concat(distCssFile))
+        .pipe(cssmin())
+        .pipe(header(opts.banner, pkg))
+        .pipe(gulp.dest(distCssPath));
+});
+
+// Concatenate & Minify JS for Heroku environment
+gulp.task('heroku:scripts', function () {
+    gutil.log('Gulp is concatenating and minifying the JavaScripts');
+    return gulp.src([
+            jsLibs + '*.js',
+            pathJs + '*.js',
+            pathJs + '**/*.js'
+        ])
+        .pipe(concat(distJsFile))
+        .pipe(uglify({
+            mangle: false
+        }))
+        .pipe(header(opts.banner, pkg))
+        .pipe(gulp.dest(distJsPath));
+});
+
+// Default Heroku Task
+gulp.task('heroku:default', ['clean'], function () {
+    gutil.log('===========================');
+    gutil.log('| Gulp is now building... |');
+    gutil.log('===========================');
+    gulp.start('heroku:styles', 'heroku:scripts');
 });
